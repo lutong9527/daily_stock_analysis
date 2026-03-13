@@ -80,6 +80,9 @@ class Config:
     # === 数据源 API Token ===
     tushare_token: Optional[str] = None
     
+    # === 智兔数服 API Token (新增) ===
+    zhitu_token: Optional[str] = None
+    
     # === AI 分析配置 ===
     # LiteLLM unified model config (provider/model format, e.g. gemini/gemini-2.5-flash)
     litellm_model: str = ""  # Primary model; must include provider prefix when set explicitly
@@ -385,6 +388,7 @@ class Config:
                 'szse.cn',         # 深交所
                 'csindex.com.cn',  # 中证指数
                 'cninfo.com.cn',   # 巨潮资讯
+                'zhitushufu.com',  # 智兔数服 (新增)
                 'localhost',
                 '127.0.0.1'
             ]
@@ -581,6 +585,7 @@ class Config:
             feishu_app_secret=os.getenv('FEISHU_APP_SECRET'),
             feishu_folder_token=os.getenv('FEISHU_FOLDER_TOKEN'),
             tushare_token=os.getenv('TUSHARE_TOKEN'),
+            zhitu_token=os.getenv('ZHITUSHUFU_API_TOKEN'),  # 新增: 智兔数服API令牌
             litellm_model=litellm_model,
             litellm_fallback_models=litellm_fallback_models,
             litellm_config_path=litellm_config_path,
@@ -1106,6 +1111,14 @@ class Config:
                 message="未配置 Tushare Token，将使用其他数据源",
                 field="TUSHARE_TOKEN",
             ))
+        
+        # 新增：智兔数服数据源检查
+        if not self.zhitu_token:
+            issues.append(ConfigIssue(
+                severity="info",
+                message="未配置智兔数服 Token，智兔数服数据源将不可用",
+                field="ZHITUSHUFU_API_TOKEN",
+            ))
 
         # --- LLM availability ---
         # llm_model_list is populated for ALL three config tiers (YAML / channels /
@@ -1301,6 +1314,7 @@ if __name__ == "__main__":
     print("=== 配置加载测试 ===")
     print(f"自选股列表: {config.stock_list}")
     print(f"数据库路径: {config.database_path}")
+    print(f"智兔数服Token: {config.zhitu_token}")
     print(f"最大并发数: {config.max_workers}")
     print(f"调试模式: {config.debug}")
     
